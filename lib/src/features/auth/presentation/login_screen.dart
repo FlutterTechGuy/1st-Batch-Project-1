@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_interview_test/src/features/auth/helpers/auth_ui_helpers.dart';
 import 'package:flutter_interview_test/src/features/auth/presentation/register_screen.dart';
 import 'package:flutter_interview_test/src/features/auth/providers/auth_provider.dart';
 import 'package:flutter_interview_test/src/features/todo/presentation/todo_view_screen.dart';
@@ -28,15 +26,19 @@ class LoginScreen extends StatelessWidget {
                         controller: emailCtrl,
                         validator: (p) {
                           if (p!.isEmpty) {
-                            return 'This field is required';
+                            return "Filed can't be empty";
                           }
-                          if (p.length < 4) {
-                            return 'Not a valid email';
+                          if (!RegExp(
+                                  r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                              .hasMatch(p)) {
+                            return "enter a valid email";
                           }
 
                           return null;
                         },
-                        decoration: InputDecoration(hintText: 'Email'),
+                        decoration: const InputDecoration(
+                          hintText: 'Email',
+                        ),
                       ),
                       TextFormField(
                         controller: passwordCtrl,
@@ -75,6 +77,27 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
               TextButton(
+                onPressed: () async {
+                  if (formKey.currentState!.validate()) {
+                    final res = await context
+                        .read<AuthProvider>()
+                        .forgotPassword(email: emailCtrl.text.trim());
+                    if (res == 'OK') {
+                      // ignore: use_build_context_synchronously
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(
+                              "Email link send to ${emailCtrl.text.trim()}")));
+                    } else {
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(SnackBar(content: Text(res)));
+                    }
+                  }
+                },
+                child: const Text(
+                  "Forgot password?",
+                ),
+              ),
+              TextButton(
                 onPressed: () {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (_) => RegisterScreen()));
@@ -82,7 +105,7 @@ class LoginScreen extends StatelessWidget {
                 child: const Text(
                   "New user?",
                 ),
-              )
+              ),
             ],
           ),
         ),

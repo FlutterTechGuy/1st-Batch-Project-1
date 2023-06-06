@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_interview_test/src/core/models/todo.dart';
 import 'package:flutter_interview_test/src/core/routes/route_contants.dart';
+import 'package:flutter_interview_test/src/features/auth/presentation/login_screen.dart';
+import 'package:flutter_interview_test/src/features/auth/providers/auth_provider.dart';
 import 'package:flutter_interview_test/src/features/todo/provider/provider.dart';
 import 'package:provider/provider.dart';
 
 class TodoViewScreen extends StatelessWidget {
- const  TodoViewScreen({super.key});
+  const TodoViewScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,6 +15,23 @@ class TodoViewScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColorLight,
         title: const Text('Todo App'),
+        actions: [
+          IconButton(
+              onPressed: () async {
+                final res = context.read<AuthProvider>().logout();
+                if (res == 'OK') {
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => LoginScreen()));
+                } else {
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(res)));
+                }
+              },
+              icon: const Icon(
+                Icons.exit_to_app,
+                color: Colors.red,
+              ))
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -86,6 +105,3 @@ class TodoViewScreen extends StatelessWidget {
     );
   }
 }
-
-
-

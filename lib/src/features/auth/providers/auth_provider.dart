@@ -56,4 +56,43 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
     return result;
   }
+
+  Future<String> forgotPassword({required String email}) async {
+    _isLoading = true;
+    _loadingText = 'Please wait..';
+
+    notifyListeners();
+    String result = 'OK';
+
+    try {
+      final res = await _repo!.forgetPassword(
+        email: email,
+      );
+      print(res);
+    } catch (e) {
+      result = e.toString();
+    }
+
+    _isLoading = false;
+    notifyListeners();
+    return result;
+  }
+ String logout()  {
+    _isLoading = true;
+    _loadingText = 'Please wait..';
+
+    notifyListeners();
+    String result = 'OK';
+
+    try {
+      final res =  _repo!.logout() ; 
+     
+    } catch (e) {
+      result = e.toString();
+    }
+
+    _isLoading = false;
+    notifyListeners();
+    return result;
+  }
 }

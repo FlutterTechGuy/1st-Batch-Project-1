@@ -28,19 +28,26 @@
 //   }
 // }
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_interview_test/src/features/auth/providers/auth_provider.dart';
 import 'package:flutter_interview_test/src/features/auth/providers/role_provider.dart';
+import 'package:flutter_interview_test/src/features/todo/presentation/todo_view_screen.dart';
 import 'package:flutter_interview_test/src/features/todo/provider/provider.dart';
 import 'package:provider/provider.dart';
 
 import 'src/features/auth/presentation/login_screen.dart';
 
+User? currentUser;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
+  currentUser = FirebaseAuth.instance.currentUser;
+
   runApp(const MyApp());
 }
 
@@ -51,12 +58,18 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => RoleProvider()),
-        ChangeNotifierProvider(create: (_) => TodoProvider()),
+        ChangeNotifierProvider(
+          create: (_) => AuthProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => RoleProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => TodoProvider(),
+        ),
       ],
       child: MaterialApp(
-        home: LoginScreen(),
+        home: currentUser == null ? LoginScreen() : const TodoViewScreen(),
       ),
     );
   }

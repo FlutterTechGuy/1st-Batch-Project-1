@@ -9,6 +9,8 @@ class RegisterScreen extends StatelessWidget {
   RegisterScreen({super.key});
   final emailCtrl = TextEditingController();
   final passwordCtrl = TextEditingController();
+  final passwordCtrl2 = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -18,28 +20,69 @@ class RegisterScreen extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              TextFormField(
-                controller: emailCtrl,
-                decoration: InputDecoration(hintText: 'Email'),
-              ),
-              TextFormField(
-                controller: passwordCtrl,
-                decoration: InputDecoration(
-                  hintText: 'Password',
-                ),
-              ),
-              TextFormField(
-                controller: passwordCtrl,
-                decoration: InputDecoration(
-                  hintText: 'Confrim Password',
+              Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: emailCtrl,
+                      decoration: const InputDecoration(hintText: 'Email'),
+                      validator: (String? value) {
+                        if (value!.isEmpty) {
+                          return "Filed can't be empty";
+                        }
+                        if (!RegExp(
+                                r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                            .hasMatch(value)) {
+                          return "enter a valid email";
+                        }
+
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      controller: passwordCtrl,
+                      decoration: const InputDecoration(
+                        hintText: 'Password',
+                      ),
+                      validator: (String? value) {
+                        if (value!.isEmpty) {
+                          return "Filed can't be empty";
+                        }
+                        if (value.length < 6) {
+                          return "Password too weak";
+                        }
+
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      controller: passwordCtrl2,
+                      decoration: const InputDecoration(
+                        hintText: 'Confirm Password',
+                      ),
+                      validator: (String? value) {
+                        if (value!.isEmpty) {
+                          return "Filed can't be empty";
+                        }
+                        if (value.length < 6) {
+                          return "Password too weak";
+                        }
+                        if (passwordCtrl.text.trim() != value) {
+                          return "Password didn't match!";
+                        }
+
+                        return null;
+                      },
+                    ),
+                  ],
                 ),
               ),
               TextButton(
                 onPressed: () async {
                   String email = emailCtrl.text.trim();
                   String pass = passwordCtrl.text.trim();
-                  if (AuthHelper.checkUserInputs(
-                      email: email, password: pass)) {
+                  if (_formKey.currentState!.validate()) {
                     final res = await context
                         .read<AuthProvider>()
                         .register(email: email, password: pass);
@@ -52,12 +95,9 @@ class RegisterScreen extends StatelessWidget {
                       ScaffoldMessenger.of(context)
                           .showSnackBar(SnackBar(content: Text(res)));
                     }
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text("Please enter all the details")));
                   }
                 },
-                child: Text(
+                child: const Text(
                   "Register ",
                 ),
               ),

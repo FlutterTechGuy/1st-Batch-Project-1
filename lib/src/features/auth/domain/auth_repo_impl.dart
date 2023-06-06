@@ -17,13 +17,23 @@ class AuthRepoImpl extends AuthRepo {
   }
 
   @override
-  Future register(
-      {
-      required String email,
-      required String password}) async {
-  final res =  _firebaseAuth!.createUserWithEmailAndPassword(email: email, password: password);
+  Future register({required String email, required String password}) async {
+    final res = _firebaseAuth!
+        .createUserWithEmailAndPassword(email: email, password: password);
 
-         
     return res;
-      }
+  }
+
+  @override
+  Future forgetPassword({required String email}) async {
+    final res = await _firebaseAuth!.sendPasswordResetEmail(email: email);
+    return res;
+  }
+
+  @override
+  Future logout() async {
+    await _firebaseAuth!.signOut();
+
+    throw UnimplementedError();
+  }
 }
